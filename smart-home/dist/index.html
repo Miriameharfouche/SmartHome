@@ -7,51 +7,130 @@
 
 </head>
 <body>
-<!-- partial:index.partial.html -->
-<ul class="navigation-bar navigation-inverse">
-  <li class="brand"><a href="#home">Smart Home</a></li>
-  <div class="right">
-    <li><a href="#manage">Manage Rooms</a></li>
+  <!-- partial:index.partial.html -->
+  <ul class="navigation-bar navigation-inverse">
+    <li class="brand"><a href="#home">Smart Home</a></li>
+    <div class="right">
+      <li><a href="#manage" onclick="test()">Add Room</a></li>
+    </div>
+  </ul>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="content">
+          <h3 class="room-title">Living Room</h3>
+          <hr />
+          <div class="device-icon"><i class="fa fa-lightbulb-o"></i></div>
+          <a class="button success-button toggle-button" href="#">Turn on Device</a>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="content">
+          <h3 class="room-title">Bedroom 1</h3>
+          <hr />
+          <div class="device-icon"><i class="fa fa-lightbulb-o"></i></div>
+          <a class="button success-button toggle-button" href="#">Turn on Device</a>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="content">
+          <h3 class="room-title">Bedroom 1 Computer</h3>
+          <hr />
+          <div class="device-icon"><i class="fa fa-plug"></i></div>
+          <a class="button success-button toggle-button enabled" href="#">Turn off Device</a>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="content">
+          <h3 class="room-title">Kitchen</h3>
+          <hr />
+          <div class="device-icon"><i class="fa fa-lightbulb-o"></i></div>
+          <a class="button success-button toggle-button" href="#">Turn on Device</a>
+        </div>
+      </div>
+    </div>
   </div>
-</ul>
-<div class="container">
-  <div class="row">
-    <div class="col-md-3">
-      <div class="content">
-        <h3 class="room-title">Living Room</h3>
-        <hr />
-        <div class="device-icon"><i class="fa fa-lightbulb-o"></i></div>
-        <a class="button success-button toggle-button" href="#">Turn on Device</a>
+  <div class="container">
+    <div class="row">
+      <h2>Room 2</h2>
+      <div class="col-md-3">
+        <div class="content">
+          <h3 class="room-title">Living Room</h3>
+          <hr />
+          <div class="device-icon"><i class="fa fa-lightbulb-o"></i></div>
+          <a class="button success-button toggle-button" href="#" onclick="changeContent('device_4')" id="device_4" >Turn on Device</a>
+        </div>
       </div>
-    </div>
-    <div class="col-md-3">
-      <div class="content">
-        <h3 class="room-title">Bedroom 1</h3>
-        <hr />
-        <div class="device-icon"><i class="fa fa-lightbulb-o"></i></div>
-        <a class="button success-button toggle-button" href="#">Turn on Device</a>
+      <div class="col-md-3">
+        <div class="content">
+          <h3 class="room-title">Bedroom 1</h3>
+          <hr />
+          <div class="device-icon"><i class="fa fa-lightbulb-o"></i></div>
+          <a class="button success-button toggle-button" href="#" onclick="changeContent('device_3')" id="device_3" >Turn on Device</a>
+        </div>
       </div>
-    </div>
-    <div class="col-md-3">
-      <div class="content">
-        <h3 class="room-title">Bedroom 1 Computer</h3>
-        <hr />
-        <div class="device-icon"><i class="fa fa-plug"></i></div>
-        <a class="button success-button toggle-button enabled" href="#">Turn off Device</a>
+      <div class="col-md-3">
+        <div class="content">
+          <h3 class="room-title">Bedroom 1 Computer</h3>
+          <hr />
+          <div class="device-icon"><i class="fa fa-plug"></i></div>
+          <a class="button success-button toggle-button enabled" href="#" onclick="changeContent('device_2')" id="device_2" >Turn off Device</a>
+        </div>
       </div>
-    </div>
-    <div class="col-md-3">
-      <div class="content">
-        <h3 class="room-title">Kitchen</h3>
-        <hr />
-        <div class="device-icon"><i class="fa fa-lightbulb-o"></i></div>
-        <a class="button success-button toggle-button" href="#">Turn on Device</a>
+      <div class="col-md-3">
+        <div class="content">
+          <h3 class="room-title">Kitchen</h3>
+          <hr />
+          <div class="device-icon"><i class="fa fa-lightbulb-o"></i></div>
+          <a class="button success-button toggle-button" href="#" onclick="changeContent('device_1')" id="device_1" >Turn on Device</a>
+        </div>
       </div>
     </div>
   </div>
-</div>
-xoxoxo
-<!-- partial -->
+  <!-- partial -->
   
 </body>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+<script type="text/javascript">
+  function test(){
+(async () => {
+
+const ipAPI = '//api.ipify.org?format=json'
+
+const inputValue = fetch(ipAPI)
+  .then(response => response.json())
+  .then(data => data.ip)
+
+const { value: ipAddress } = await Swal.fire({
+  title: 'Enter your room id',
+  input: 'text',
+  inputValue: inputValue,
+  inputValidator: (value) => {
+    if (!value) {
+      return 'You need to write something!'
+    }
+  }
+})
+
+if (ipAddress) {
+  Swal.fire(`the id is ${ipAddress}`)
+}
+
+})()
+}
+function changeContent(id){
+  if(document.getElementById(id).className == "button success-button toggle-button enabled"){
+    document.getElementById(id).className = "button success-button toggle-button";
+    document.getElementById(id).innerHTML = "Turn on Device";
+
+  }else{
+    document.getElementById(id).className = "button success-button toggle-button enabled";
+    document.getElementById(id).innerHTML = "Turn off Device";
+
+  }
+
+}
+</script>
 </html>
