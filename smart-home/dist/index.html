@@ -6,16 +6,21 @@
   <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'><link rel="stylesheet" href="./style.css">
 
 </head>
-<body>
+<body onload="getRooms()">
   <!-- partial:index.partial.html -->
   <ul class="navigation-bar navigation-inverse">
     <li class="brand"><a href="#home">Smart Home</a></li>
-    <div class="right">
+    <div class="left">
       <li><a href="#manage" onclick="test()">Add Room</a></li>
+      <li><a href="#manage" onclick="test()">Other</a></li>
+      <li><a href="#manage" onclick="test()">Contact Us</a></li>
+      
     </div>
   </ul>
-  <div class="container">
+<!--   <div class="container">
     <div class="row">
+
+      <h2>Room 1</h2>
       <div class="col-md-3">
         <div class="content">
           <h3 class="room-title">Living Room</h3>
@@ -29,7 +34,7 @@
           <h3 class="room-title">Bedroom 1</h3>
           <hr />
           <div class="device-icon"><i class="fa fa-lightbulb-o"></i></div>
-          <a class="button success-button toggle-button" href="#">Turn on Device</a>
+          <a class="button success-button toggle-button" href="#" >Turn on Device</a>
         </div>
       </div>
       <div class="col-md-3">
@@ -49,45 +54,7 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="container">
-    <div class="row">
-      <h2>Room 2</h2>
-      <div class="col-md-3">
-        <div class="content">
-          <h3 class="room-title">Living Room</h3>
-          <hr />
-          <div class="device-icon"><i class="fa fa-lightbulb-o"></i></div>
-          <a class="button success-button toggle-button" href="#" onclick="changeContent('device_4')" id="device_4" >Turn on Device</a>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="content">
-          <h3 class="room-title">Bedroom 1</h3>
-          <hr />
-          <div class="device-icon"><i class="fa fa-lightbulb-o"></i></div>
-          <a class="button success-button toggle-button" href="#" onclick="changeContent('device_3')" id="device_3" >Turn on Device</a>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="content">
-          <h3 class="room-title">Bedroom 1 Computer</h3>
-          <hr />
-          <div class="device-icon"><i class="fa fa-plug"></i></div>
-          <a class="button success-button toggle-button enabled" href="#" onclick="changeContent('device_2')" id="device_2" >Turn off Device</a>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="content">
-          <h3 class="room-title">Kitchen</h3>
-          <hr />
-          <div class="device-icon"><i class="fa fa-lightbulb-o"></i></div>
-          <a class="button success-button toggle-button" href="#" onclick="changeContent('device_1')" id="device_1" >Turn on Device</a>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- partial -->
+  </div> -->
   
 </body>
 
@@ -95,42 +62,241 @@
 
 <script type="text/javascript">
   function test(){
-(async () => {
+    (async () => {
 
-const ipAPI = '//api.ipify.org?format=json'
+      const ipAPI = '//api.ipify.org?format=json'
 
-const inputValue = fetch(ipAPI)
-  .then(response => response.json())
-  .then(data => data.ip)
+      const inputValue = fetch(ipAPI)
+      .then(response => response.json())
+      .then(data => data.ip)
 
-const { value: ipAddress } = await Swal.fire({
-  title: 'Enter your room id',
-  input: 'text',
-  inputValue: inputValue,
-  inputValidator: (value) => {
-    if (!value) {
-      return 'You need to write something!'
+      const { value: ipAddress } = await Swal.fire({
+        title: 'Enter your room id',
+        input: 'text',
+        inputValue: inputValue,
+        inputValidator: (value) => {
+          if (!value) {
+            return 'You need to write something!'
+          }
+        }
+      })
+
+      if (ipAddress) {
+        Swal.fire(`the id is ${ipAddress}`)
+      }
+
+    })()
+  }
+
+  function loadInterface(rooms){
+
+    var a_elements = []
+      var count = 0
+    rooms.forEach(room => {
+      
+      const div_container = document.createElement("div");
+      div_container.className = "container";
+
+      const div_row = document.createElement("div");
+      div_row.className = "row";
+
+      const room_heading = document.createElement("h2");
+      const room_text = document.createTextNode("Room "+room.id);
+      room_heading.appendChild(room_text);
+      div_row.appendChild(room_heading);
+
+
+      
+      //replace with thing name when API is ready ..
+
+      var things = room.things
+      things.forEach(thing => {
+        
+        const div_col = document.createElement("div");
+        div_col.className = "col-md-3";
+
+        const div_content = document.createElement("div");
+        div_content.className = "content";
+        const header_name = document.createElement("h3");
+
+        var name = "name_"+thing.id;
+        const header_value = document.createTextNode(name);
+        header_name.className = "room-title";
+        header_name.appendChild(header_value);
+
+        const div_icon = document.createElement("div");
+        div_icon.className = "device-icon";
+        const icon = document.createElement("i");
+        if(thing instanceof Light){
+          icon.className = "fa fa-lightbulb-o"; 
+        }else{
+          icon.className = "fa fa-plug"
+        }
+
+      
+        div_icon.appendChild(icon);
+
+        // button initializiation ..
+        const ahref = document.createElement("a");
+        var id = "device_"+count;
+        ahref.id = id;
+
+        ahref.href = "#";
+        
+        a_elements.push(new Pair(ahref,room.id))
+
+        ahref.appendChild(document.createTextNode("Turn on device"));
+
+        if(thing.status == "ON"){
+
+          ahref.className="button success-button toggle-button enabled";
+        }
+        else{
+
+          ahref.className="button success-button toggle-button";
+        }
+        
+        div_content.appendChild(header_name);
+        div_content.appendChild(document.createElement("hr"))
+        div_content.appendChild(div_icon);
+        div_content.appendChild(ahref);
+
+        div_col.appendChild(div_content);
+        div_row.appendChild(div_col);
+        count++;
+        })
+        
+    div_container.appendChild(div_row);
+  
+    document.body.appendChild(div_container);
+    })
+
+  a_elements.forEach(function(a){
+    a.ahref.addEventListener('click', function (){
+      var request = new XMLHttpRequest()
+    // Open a new connection, using the GET request on the URL endpoint
+    request.open('PUT', 'http://thawing-journey-78988.herokuapp.com/api/rooms/'+a.room_id+'/switch-light-and-list/', true)
+
+    request.onload = function(){
+       var data = JSON.parse(this.response)
+
+      if (request.status >= 200 && request.status < 400) {
+        
+        if(document.getElementById(a.ahref.id).className == "button success-button toggle-button enabled"){
+            document.getElementById(a.ahref.id).className = "button success-button toggle-button";
+            document.getElementById(a.ahref.id).innerHTML = "Turn on Device";
+        }else{
+          document.getElementById(a.ahref.id).className = "button success-button toggle-button enabled";
+          document.getElementById(a.ahref.id).innerHTML = "Turn off Device";
+        }
+        data.forEach(room => {
+
+            console.log(room)
+
+        })
+        //printRooms(rooms)
+      } else {
+      console.log('error')
+      }
     }
+
+    // Send request
+    request.send()
+
+
+
+    
+    });
+
+  })
+} //end of function load .. 
+
+
+
+function printRooms(rooms){
+   rooms.forEach(room =>{
+
+      console.log(room)
+    })
+}
+function getRooms(){
+
+   var rooms = []
+    var request = new XMLHttpRequest()
+    // Open a new connection, using the GET request on the URL endpoint
+    request.open('GET', 'http://thawing-journey-78988.herokuapp.com/api/rooms/', true)
+
+    request.onload = function(){
+       var data = JSON.parse(this.response)
+
+      if (request.status >= 200 && request.status < 400) {
+        
+        data.forEach(room => {
+
+            var things = []
+            
+            var light = new Light(room.light.id,room.light.level,room.light.status)
+            var noise = new Noise(room.noise.id,room.noise.level,room.noise.status)
+            
+            var room = new Room(room.id,[])
+
+            room.addThing(light)
+            room.addThing(noise)
+
+
+           rooms.push(room)
+
+        })
+        //printRooms(rooms)
+        loadInterface(rooms)
+      } else {
+      console.log('error')
+      }
+    }
+
+    // Send request
+    request.send()
+
+
+}
+class Pair{
+  constructor(ahref,room_id){
+    this.ahref = ahref
+    this.room_id = room_id
   }
-})
-
-if (ipAddress) {
-  Swal.fire(`the id is ${ipAddress}`)
 }
-
-})()
+class Room {
+  constructor(id,things){
+    this.id = id;
+    this.things = things
+  }
+  addThing(thing){
+    this.things.push(thing)
+  }
 }
-function changeContent(id){
-  if(document.getElementById(id).className == "button success-button toggle-button enabled"){
-    document.getElementById(id).className = "button success-button toggle-button";
-    document.getElementById(id).innerHTML = "Turn on Device";
-
-  }else{
-    document.getElementById(id).className = "button success-button toggle-button enabled";
-    document.getElementById(id).innerHTML = "Turn off Device";
+class Thing {
+  constructor(){
 
   }
-
 }
+class Light extends Thing{
+  constructor(id,level,status){
+    super()
+    this.id = id
+    this.level = level
+    this.status = status
+  }
+}
+class Noise extends Thing{
+  constructor(id,level,status){
+    super()
+    this.id = id
+    this.level = level
+    this.status = status
+  }
+}
+// defer keeps order <script defer src ... >
+// async doesn't keep order 
 </script>
 </html>
+
