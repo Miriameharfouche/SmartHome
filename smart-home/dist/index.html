@@ -234,7 +234,7 @@
         }
         
         const btn_delete = document.createElement("a");
-      btn_delete.className="button-delete";
+      btn_delete.className="button";
       btn_delete.appendChild(document.createTextNode("Delete Light"));
       btn_delete.id = 'btn_delete_light_'+room.id
       btn_delete.href = "#";
@@ -256,7 +256,7 @@
         slider.setAttribute("value",thing.level);
         slider.setAttribute("class","slider");
 
-        a_elements.push(new LightController(ahref,slider,thing.id))
+        a_elements.push(new LightController(ahref,slider,btn_delete,thing.id))
         
         div_content.appendChild(header_name);
         div_content.appendChild(document.createElement("hr"))
@@ -312,41 +312,76 @@
     a.brightness_slider.addEventListener('mouseup',function(){
       console.log('brightness_value: '+a.brightness_slider.value+" --- "+a.light_id)
       var request = new XMLHttpRequest()
-    // Open a new connection, using the GET request on the URL endpoint
-    request.open('POST', 'https://alyhdr.cleverapps.io/api/lights/'+a.light_id+'/bri/', true)
-    request.setRequestHeader("Content-type", "application/json");
-    
-    request.onload = function(){
-       var data = JSON.parse(this.response)
+      // Open a new connection, using the GET request on the URL endpoint
+      request.open('POST', 'https://alyhdr.cleverapps.io/api/lights/'+a.light_id+'/bri/', true)
+      request.setRequestHeader("Content-type", "application/json");
+      
+      request.onload = function(){
+         var data = JSON.parse(this.response)
 
-      if (request.status >= 200 && request.status < 400) {
-        console.log(this.response)
-         console.log('done !');
-         const Toast = Swal.mixin({
-                  toast: true,
-                  position: 'top-end',
-                  showConfirmButton: false,
-                  timer: 2000,
-                  timerProgressBar: true,
-                  onOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                  }
-                })
+        if (request.status >= 200 && request.status < 400) {
+          console.log(this.response)
+           console.log('done !');
+           const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    onOpen: (toast) => {
+                      toast.addEventListener('mouseenter', Swal.stopTimer)
+                      toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                  })
 
-                Toast.fire({
-                  icon: 'success',
-                  title: 'Changed successfully'
-                })
+                  Toast.fire({
+                    icon: 'success',
+                    title: 'Changed successfully'
+                  })
 
-      } else {
-      console.log('error')
+        } else {
+        console.log('error')
+        }
       }
-    }
-    // Send request
-    var payload='{"level": '+a.brightness_slider.value+' }';
-    request.send(payload)
+      // Send request
+      var payload='{"level": '+a.brightness_slider.value+' }';
+      request.send(payload)
     });
+    a.delete_btn.addEventListener('click',function(){
+      var request = new XMLHttpRequest()
+      // Open a new connection, using the GET request on the URL endpoint
+      request.open('DELETE', 'https://alyhdr.cleverapps.io/api/lights/'+a.light_id, true)
+      request.setRequestHeader("Content-type", "application/json");
+      
+      request.onload = function(){
+
+        if (request.status >= 200 && request.status < 400) {
+          console.log(this.response)
+          getRooms() // init rooms interface again..
+           console.log('Deleted !');
+           const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    onOpen: (toast) => {
+                      toast.addEventListener('mouseenter', Swal.stopTimer)
+                      toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                  })
+
+                  Toast.fire({
+                    icon: 'success',
+                    title: 'Changed successfully'
+                  })
+
+        } else {
+        console.log('error')
+        }
+      }
+      request.send()
+    })
   })
   initListenerRoomController(room_controllers)
 } //end of function load .. 
@@ -505,9 +540,10 @@ function getRooms(){
 
 }
 class LightController{
-  constructor(ahref,brightness_slider,light_id){
+  constructor(ahref,brightness_slider,delete_btn,light_id){
     this.ahref = ahref
     this.brightness_slider = brightness_slider
+    this.delete_btn = delete_btn
     this.light_id = light_id
 
   }
