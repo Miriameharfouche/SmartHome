@@ -5,7 +5,7 @@
   <title>Smart Home</title>
   <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'><link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./slider.css">
-
+  <script src="./js/lights.js"></script>
   <style type="text/css">
     
   </style>
@@ -147,7 +147,7 @@
       div_container.id = "container_rooms";
       const div_row = document.createElement("div");
       div_row.className = "row";
-
+      div_row.id = "#div_"+room.id;
       const room_heading = document.createElement("h2");
       const room_text = document.createTextNode(room.name);
       room_heading.appendChild(room_text);
@@ -166,21 +166,21 @@
       btn_add_light.className="button success-button toggle-button";
       btn_add_light.appendChild(document.createTextNode("Add Light"));
       btn_add_light.id = 'btn_add_light_'+room.id
-      btn_add_light.href = "#";
+      btn_add_light.href = "#div_"+room.id;
       div_row.appendChild(btn_add_light)
 
       const btn_switch_all_on = document.createElement("a");
       btn_switch_all_on.className="button success-button toggle-button";
       btn_switch_all_on.appendChild(document.createTextNode("Switch All ON"));
       btn_switch_all_on.id = 'btn_switch_all_on_'+room.id
-      btn_switch_all_on.href = "#";
+      btn_switch_all_on.href = "#div_"+room.id;
       div_row.appendChild(btn_switch_all_on)
 
       const btn_switch_all_off = document.createElement("a");
       btn_switch_all_off.className="button success-button toggle-button";
       btn_switch_all_off.appendChild(document.createTextNode("Switch All off"));
       btn_switch_all_off.id = 'btn_switch_all_off_'+room.id
-      btn_switch_all_off.href = "#";
+      btn_switch_all_off.href = "#div_"+room.id;
       div_row.appendChild(btn_switch_all_off)
 
 
@@ -206,9 +206,15 @@
 
         const div_icon = document.createElement("div");
         div_icon.className = "device-icon";
-        const icon = document.createElement("i");
+        const icon = document.createElement("img");
+        icon.id = "icon_"+count
+        icon.setAttribute("width", "120")
+        icon.setAttribute("height", "120")
+        
         if(thing instanceof Light){
-          icon.className = "fa fa-lightbulb-o"; 
+          //icon.className = "fas fa-lightbulb"; 
+          
+          
         }else{
           icon.className = "fa fa-plug"
         }
@@ -221,26 +227,32 @@
         var id = "btn_"+count;
         ahref.id = id;
 
-        ahref.href = "#";
+        ahref.href = "#div_"+room.id;
         
         if(thing.status == "ON"){
           ahref.appendChild(document.createTextNode("Turn off device"));
           ahref.className="button success-button toggle-button enabled";
+          icon.setAttribute("src", "./images/light_on.png")
         }
         else{
 
           ahref.appendChild(document.createTextNode("Turn on device"));
           ahref.className="button success-button toggle-button";
+          icon.setAttribute("src", "./images/light_off.png")
         }
         
         const btn_delete = document.createElement("a");
-      btn_delete.className="button";
-      btn_delete.appendChild(document.createTextNode("Delete Light"));
-      btn_delete.id = 'btn_delete_light_'+room.id
-      btn_delete.href = "#";
-      div_row.appendChild(btn_delete)
-      
-        // <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+        
+        btn_delete.className="button";
+        btn_delete.appendChild(document.createTextNode("Delete Light"));
+        btn_delete.id = 'btn_delete_light_'+room.id
+        btn_delete.href = "#div_"+room.id;
+        
+        const btn_change_color = document.createElement("a");
+        btn_change_color.className="button success-button toggle-button enabled";
+        btn_change_color.appendChild(document.createTextNode("Change color"));
+        btn_change_color.href = "#div_"+room.id;
+        
 
         const brightness_name  = document.createElement("h3");
         var name = "Brightness";
@@ -256,7 +268,7 @@
         slider.setAttribute("value",thing.level);
         slider.setAttribute("class","slider");
 
-        a_elements.push(new LightController(ahref,slider,btn_delete,thing.id))
+        a_elements.push(new LightController(ahref,slider,btn_delete,icon,btn_change_color,thing.id))
         
         div_content.appendChild(header_name);
         div_content.appendChild(document.createElement("hr"))
@@ -265,11 +277,15 @@
         div_content.appendChild(document.createElement("br"))
         
         div_content.appendChild(btn_delete);
+        div_content.appendChild(document.createElement("br"))
+
         div_content.appendChild(document.createElement("hr"));
         
         div_content.appendChild(brightness_name);
         div_content.appendChild(document.createElement("br"));
         div_content.appendChild(slider);
+        div_content.appendChild(document.createElement("br"));
+        div_content.appendChild(btn_change_color)
         div_col.appendChild(div_content);
         div_row.appendChild(div_col);
         count++;
@@ -297,9 +313,11 @@
         if(document.getElementById(a.ahref.id).className == "button success-button toggle-button enabled"){
             document.getElementById(a.ahref.id).className = "button success-button toggle-button";
             document.getElementById(a.ahref.id).innerHTML = "Turn on Device";
+            document.getElementById(a.ligth_icon.id).src = "./images/light_off.png"
         }else{
           document.getElementById(a.ahref.id).className = "button success-button toggle-button enabled";
           document.getElementById(a.ahref.id).innerHTML = "Turn off Device";
+          document.getElementById(a.ligth_icon.id).src = "./images/light_on.png"
         }
       } else {
       console.log('error')
@@ -381,6 +399,14 @@
         }
       }
       request.send()
+    })
+    a.btn_change_color.addEventListener('click',function(){
+      Swal.fire({
+            title: '<strong>Choose color</strong>',
+            icon: 'info',
+            html:
+              '<b>You can use html tags in here<b>'
+          })
     })
   })
   initListenerRoomController(room_controllers)
@@ -540,12 +566,13 @@ function getRooms(){
 
 }
 class LightController{
-  constructor(ahref,brightness_slider,delete_btn,light_id){
+  constructor(ahref,brightness_slider,delete_btn,ligth_icon,btn_change_color,light_id){
     this.ahref = ahref
     this.brightness_slider = brightness_slider
     this.delete_btn = delete_btn
     this.light_id = light_id
-
+    this.ligth_icon = ligth_icon
+    this.btn_change_color = btn_change_color
   }
 }
 
