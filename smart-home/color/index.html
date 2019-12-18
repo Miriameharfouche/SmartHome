@@ -2,35 +2,22 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>iro.js demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-<link rel="stylesheet" href="./style.css">
-
+  <title>Radial Color Picker - Vue</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"><link rel='stylesheet' href='https://unpkg.com/@radial-color-picker/vue-color-picker/dist/vue-color-picker.min.css'><link rel="stylesheet" href="./style.css">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
 <!-- partial:index.partial.html -->
-<html>
-  <head>
-  </head>
-  <body>
-    <div class="wrap">
-      <div class="half">
-        <div class="colorPicker"></div>
-      </div>
-      <div class="half readout">
-        <p>
-          iro.js is an HSV color picker widget for JavaScript with a modern SVG-based user interface -- and no jQuery or extra CSS / images.
-        </p>
-        <span class="title link">Head to <a href="https://iro.js.org?ref=codepen" target="blank">iro.js.org</a> for full documentation and features, or check out the source code on <a href="https://github.com/jaames/iro.js" target="blank">GitHub</a>!
-        </span>
-        <span class="title">Selected Color:</span>
-        <div id="values"></div>
-      </div>
-    </div>
-  </body>
-</html>
+<div id="app">
+    <color-picker v-bind="color" @input="onInput"></color-picker>
+    <h1 v-text="msg"></h1>
+    
+    {{hue}}
+   <button id="button" v-on:click="changeColor" >Choose</button>
+</div>
 <!-- partial -->
-  <script src='https://cdn.jsdelivr.net/npm/@jaames/iro/dist/iro.min.js'></script><script  src="./script.js"></script>
+  <script src='https://unpkg.com/vue'></script>
+<script src='https://unpkg.com/@radial-color-picker/vue-color-picker/dist/vue-color-picker.umd.min.js'></script><script  src="./script.js"></script>
 
 </body>
 </html>

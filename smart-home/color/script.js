@@ -1,23 +1,46 @@
-// Create a new color picker instance
-// https://iro.js.org/guide.html#getting-started
-var colorPicker = new iro.ColorPicker(".colorPicker", {
-  // color picker options
-  // Option guide: https://iro.js.org/guide.html#color-picker-options
-  width: 280,
-  color: "rgb(255, 0, 0)",
-  borderWidth: 1,
-  borderColor: "#fff" });
+var ColorPicker = VueColorPicker;
 
+var app = new Vue({
+    el: '#app',
+    components: {
+        ColorPicker: ColorPicker
+    },
+    data: {
+        msg: 'Radial Color Picker - Vue',
+        color: {
+            hue: 50,
+            saturation: 100,
+            luminosity: 50,
+            alpha: 1
 
-var values = document.getElementById("values");
-
-// https://iro.js.org/guide.html#color-picker-events
-colorPicker.on(["color:init", "color:change"], function (color) {
-  // Show the current color in different formats
-  // Using the selected color: https://iro.js.org/guide.html#selected-color-api
-  values.innerHTML = [
-  "hex: " + color.hexString,
-  "rgb: " + color.rgbString,
-  "hsl: " + color.hslString].
-  join("<br>");
+        },
+          lights:[],
+      selectLight:0,
+        hue:0
+    },
+    mounted () {
+        axios
+        .get('https://miriameharfouche.cleverapps.io/api/lights')
+      .then(response => {
+        this.lights = response.data
+       
+      },
+      )
+},
+    methods: {
+        onInput: function(hue) {
+            this.color.hue = hue;
+this.hue=hue*360;
+        },
+        changeColor:function () {
+            let post_url= "https://alyhdr.cleverapps.io/api/lights/1/hue";
+              axios.post(post_url,{
+                color:this.hue})
+            .then(response => {}) 
+            .catch(function (error) {
+                            console.log(error);
+            
+})
+    }
+}
 });
