@@ -274,7 +274,7 @@
         slider.setAttribute("value",thing.level);
         slider.setAttribute("class","slider");
 
-        a_elements.push(new LightController(ahref,slider,btn_delete,icon,btn_change_color,thing.id))
+        a_elements.push(new LightController(ahref,slider,btn_delete,icon,btn_change_color,thing.id,thing))
         
         div_content.appendChild(header_name);
         div_content.appendChild(document.createElement("hr"))
@@ -407,6 +407,7 @@
       request.send()
     })
     a.btn_change_color.addEventListener('click',function(){
+      console.log('Light color: '+a.light.color)
       Swal.fire({
             title: '<strong>Choose color</strong>',
             icon: 'info',
@@ -414,7 +415,6 @@
               '<div id="app">\
                     <color-picker v-bind="color" @input="onInput"></color-picker>\
                     <h1 v-text="msg"></h1>\
-                    {{hue}}\
                 </div>'
           }).then( result =>{
               app.changeColor()
@@ -428,15 +428,14 @@
             data: {
                 msg: 'Radial Color Picker - Vue',
                 color: {
-                    hue: 50,
+                    hue:a.light.color/182 ,
                     saturation: 100,
                     luminosity: 50,
                     alpha: 1
 
                 },
                   lights:[],
-              selectLight:0,
-                hue:0
+              selectLight:0
             },
             mounted () {
                 axios
@@ -450,9 +449,10 @@
             methods: {
                 onInput: function(hue) {
                     this.color.hue = hue;
-                    this.hue=hue*360;
+                    this.hue=hue*182;
                 },
                 changeColor:function () {
+                  a.light.color = this.hue
                     let post_url= "https://alyhdr.cleverapps.io/api/lights/"+a.light_id+"/hue";
                       axios.post(post_url,{
                         color:this.hue
@@ -462,6 +462,7 @@
                                     console.log(error);
                     
                           })
+
             }
         }
         });
@@ -602,7 +603,7 @@ function getRooms(){
             var room = new Room(room.id,room.name,[])
             lights.forEach(light => {
               // console.log(light)
-              var light_obj = new Light(light.id,light.level,light.status)
+              var light_obj = new Light(light.id,light.level,light.status,light.color)
               room.addThing(light_obj)
             })
             //var noise = new Noise(room.noise.id,room.noise.level,room.noise.status)
@@ -625,13 +626,14 @@ function getRooms(){
 
 }
 class LightController{
-  constructor(ahref,brightness_slider,delete_btn,ligth_icon,btn_change_color,light_id){
+  constructor(ahref,brightness_slider,delete_btn,ligth_icon,btn_change_color,light_id,light){
     this.ahref = ahref
     this.brightness_slider = brightness_slider
     this.delete_btn = delete_btn
     this.light_id = light_id
     this.ligth_icon = ligth_icon
     this.btn_change_color = btn_change_color
+    this.light=light
   }
 }
 
@@ -661,10 +663,11 @@ class Thing {
   }
 }
 class Light extends Thing{
-  constructor(id,level,status){
+  constructor(id,level,status,color){
     super()
     this.id = id
     this.level = level
+    this.color=color
     this.status = status
   }
 }
